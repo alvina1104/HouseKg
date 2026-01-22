@@ -17,13 +17,22 @@ class UserProfile(AbstractUser):
 class Region(models.Model):
     region_name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.region_name
+
 class City(models.Model):
     region = models.ForeignKey(Region,on_delete=models.CASCADE)
     city_name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.city_name
+
 class District(models.Model):
     city = models.ForeignKey(City,on_delete=models.CASCADE)
     district_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.district_name
 
 class Property(models.Model):
     title = models.CharField(max_length=120)
@@ -56,6 +65,9 @@ class Property(models.Model):
     condition = models.CharField(max_length=120,choices=ConditionChoices,default='any')
     documents = models.BooleanField()
     seller = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
 
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property,on_delete=models.CASCADE)
