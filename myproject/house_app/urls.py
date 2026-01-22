@@ -1,18 +1,24 @@
 from django.urls import path, include
-from .views import (UserProfileViewSet, RegionViewSet, CityViewSet, DistrictViewSet,
-                    PropertyViewSet, PropertyImageViewSet, ReviewViewSet)
+from .views import (UserProfileListAPIView,UserProfileDetailAPIView, RegionListAPIView,RegionDetailAPIView,
+                    CityListAPIView,CityDetailAPIView, DistrictListAPIView,DistrictDetailAPIView,
+                    PropertyListAPIView,PropertyDetailAPIView, ReviewCreateAPIView)
 from rest_framework import routers
 
-router = routers.DefaultRouter()
-router.register(r'users', UserProfileViewSet)
-router.register(r'regions', RegionViewSet)
-router.register(r'cities', CityViewSet)
-router.register(r'districts', DistrictViewSet)
-router.register(r'properties', PropertyViewSet)
-router.register(r'property_image', PropertyImageViewSet)
-router.register(r'reviews', ReviewViewSet)
+router = routers.SimpleRouter()
+
 
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('region/', RegionListAPIView.as_view(),name='region_list'),
+    path('region/<int:pk>/', RegionDetailAPIView.as_view(),name='region_detail'),
+    path('city/', CityListAPIView.as_view(),name='city_list'),
+    path('city/<int:pk>/', CityDetailAPIView.as_view(),name='city_detail'),
+    path('district/', DistrictListAPIView.as_view(),name='district'),
+    path('district/<int:pk>/', DistrictDetailAPIView.as_view(),name='district_detail'),
+    path('property/', PropertyListAPIView.as_view(),name='property_list'),
+    path('property/<int:pk>/', PropertyDetailAPIView.as_view(),name='property_detail'),
+    path('user/', UserProfileListAPIView.as_view(),name='user_list'),
+    path('user/<int:pk>/', UserProfileDetailAPIView.as_view(),name='user_detail'),
+    path('review/', ReviewCreateAPIView.as_view(),name='reviews'),
 ]

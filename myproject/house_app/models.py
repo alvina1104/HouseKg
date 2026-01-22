@@ -21,14 +21,14 @@ class Region(models.Model):
         return self.region_name
 
 class City(models.Model):
-    region = models.ForeignKey(Region,on_delete=models.CASCADE)
+    region = models.ForeignKey(Region,on_delete=models.CASCADE,related_name='cities')
     city_name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.city_name
 
 class District(models.Model):
-    city = models.ForeignKey(City,on_delete=models.CASCADE)
+    city = models.ForeignKey(City,on_delete=models.CASCADE,related_name='districts')
     district_name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -47,10 +47,11 @@ class Property(models.Model):
     ('parking/garage','parking/garage')
     )
     property_type = models.CharField(max_length=120,choices=PropertyChoices)
-    region = models.ForeignKey(Region,on_delete=models.CASCADE)
-    district = models.ForeignKey(District,on_delete=models.CASCADE)
+    region = models.ForeignKey(Region,on_delete=models.CASCADE,related_name='properties')
+    city = models.ForeignKey(City,on_delete=models.CASCADE,related_name='properties')
+    district = models.ForeignKey(District,on_delete=models.CASCADE,related_name='properties')
     address = models.CharField(max_length=100)
-    area = models.DecimalField(max_digits=5,decimal_places=1)
+    area = models.CharField()
     price = models.PositiveBigIntegerField()
     rooms = models.PositiveIntegerField()
     floor = models.PositiveIntegerField()
@@ -64,22 +65,35 @@ class Property(models.Model):
     ('any','any'))
     condition = models.CharField(max_length=120,choices=ConditionChoices,default='any')
     documents = models.BooleanField()
-    seller = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
+    created_date = models.DateField(auto_now_add=True)
+    seller = models.ForeignKey(UserProfile,on_delete=models.CASCADE, related_name='user')
 
     def __str__(self):
         return self.title
 
+    def get_avg_rating(self):
+        reviews = self.reviews.all()
+        if reviews.exists():
+            return round(sum(i.rating for i in reviews) / reviews.count(), 1)
+        return 0
+
+    def get_count_person(self):
+        return self.reviews.count()
+
 class PropertyImage(models.Model):
-    property = models.ForeignKey(Property,on_delete=models.CASCADE)
+    property = models.ForeignKey(Property,on_delete=models.CASCADE,related_name='property_images')
     property_image = models.ImageField(upload_to='property_photos')
 
 class Review(models.Model):
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE,related_name='reviews_written')
     seller = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name='reviews_received')
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE,related_name='reviews')
     rating = models.PositiveSmallIntegerField(choices=[(i, str(i))for i in range(1, 6)])
     comment = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.author},{self.seller}'
 
 
 

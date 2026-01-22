@@ -1,34 +1,61 @@
 from rest_framework import viewsets, generics
-from .serializers import (UserProfileSerializer, RegionSerializer, CitySerializer,
-                          DistrictSerializer, PropertySerializer,
-                          PropertyImageSerializer, ReviewSerializer)
-from .models import (UserProfile, Region,
-                     City, District, Property, PropertyImage, Review)
+from .serializers import (UserProfileListSerializer,UserProfileDetailSerializer,
+                          RegionListSerializer,RegionDetailSerializer,
+                          CityListSerializer,CityDetailSerializer,
+                          DistrictListSerializer,DistrictDetailSerializer,
+                          PropertyListSerializer,PropertyDetailSerializer,ReviewCreateSerializer)
+from .models import (UserProfile, Region, City, District, Property,Review)
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import PropertyFilter
+from rest_framework.filters import SearchFilter,OrderingFilter
+from .pagination import PropertyPagination
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileListAPIView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+    serializer_class = UserProfileListSerializer
 
-class RegionViewSet(viewsets.ModelViewSet):
+class UserProfileDetailAPIView(generics.RetrieveAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileDetailSerializer
+
+class RegionListAPIView(generics.ListAPIView):
     queryset = Region.objects.all()
-    serializer_class = RegionSerializer
+    serializer_class = RegionListSerializer
 
-class CityViewSet(viewsets.ModelViewSet):
+class RegionDetailAPIView(generics.RetrieveAPIView):
+    queryset = Region.objects.all()
+    serializer_class = RegionDetailSerializer
+
+class CityListAPIView(generics.ListAPIView):
     queryset = City.objects.all()
-    serializer_class = CitySerializer
+    serializer_class = CityListSerializer
 
-class DistrictViewSet(viewsets.ModelViewSet):
+class CityDetailAPIView(generics.RetrieveAPIView):
+    queryset = City.objects.all()
+    serializer_class = CityDetailSerializer
+
+class DistrictListAPIView(generics.ListAPIView):
     queryset = District.objects.all()
-    serializer_class = DistrictSerializer
+    serializer_class = DistrictListSerializer
 
-class PropertyViewSet(viewsets.ModelViewSet):
+class DistrictDetailAPIView(generics.RetrieveAPIView):
+    queryset = District.objects.all()
+    serializer_class = DistrictDetailSerializer
+
+class PropertyListAPIView(generics.ListAPIView):
     queryset = Property.objects.all()
-    serializer_class = PropertySerializer
+    serializer_class = PropertyListSerializer
+    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
+    filterset_class = PropertyFilter
+    search_fields = ['region_name','city_name','district_name']
+    ordering_fields =['price','created_date','area']
+    pagination_class = PropertyPagination
 
-class PropertyImageViewSet(viewsets.ModelViewSet):
-    queryset = PropertyImage.objects.all()
-    serializer_class = PropertyImageSerializer
+class PropertyDetailAPIView(generics.RetrieveAPIView):
+    queryset = Property.objects.all()
+    serializer_class = PropertyDetailSerializer
 
-class ReviewViewSet(viewsets.ModelViewSet):
+
+class ReviewCreateAPIView(generics.CreateAPIView):
     queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+    serializer_class = ReviewCreateSerializer
